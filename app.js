@@ -8,6 +8,10 @@ const products = [
   { id: 3, name: "Product C", price: 20 }
 ];
 
+app.get('/', (req, res) => {
+  res.send('Welcome to the E-commerce API!');
+});
+
 app.get('/products', (req, res) => {
   res.json(products);
 });
@@ -15,3 +19,4 @@ app.get('/products', (req, res) => {
 app.listen(port, () => {
   console.log(`E-commerce app listening at http://localhost:${port}`);
 });
+
