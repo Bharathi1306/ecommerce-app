@@ -1,22 +1,39 @@
 const express = require('express');
+const mongoose = require('mongoose');
+require('dotenv').config();
+
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
 
-const products = [
-  { id: 1, name: "Product A", price: 50 },
-  { id: 2, name: "Product B", price: 30 },
-  { id: 3, name: "Product C", price: 20 }
-];
+app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('Welcome to the E-commerce API!');
+// MongoDB connection
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => console.log('✅ MongoDB connected'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
+
+// Product schema
+const productSchema = new mongoose.Schema({
+  name: String,
+  price: Number
 });
 
-app.get('/products', (req, res) => {
+const Product = mongoose.model('Product', productSchema);
+
+// Routes
+app.get('/products', async (req, res) => {
+  const products = await Product.find();
   res.json(products);
 });
 
-app.listen(port, () => {
-  console.log(`E-commerce app listening at http://localhost:${port}`);
+app.post('/products', async (req, res) => {
+  const newProduct = new Product(req.body);
+  const saved = await newProduct.save();
+  res.json(saved);
 });
 
+app.listen(port, () => {
+  console.log(`🚀 Server running at http://localhost:${port}`);
+});
